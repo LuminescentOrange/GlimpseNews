@@ -1,8 +1,13 @@
 package com.project.tinnews.repository;
 
+import android.os.AsyncTask;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.project.tinnews.TinNewsApplication;
+import com.project.tinnews.database.TinNewsDatabase;
+import com.project.tinnews.model.Article;
 import com.project.tinnews.model.NewsResponse;
 import com.project.tinnews.network.NewsApi;
 import com.project.tinnews.network.RetrofitClient;
@@ -14,9 +19,47 @@ import retrofit2.Response;
 public class NewsRepository {
 
     private final NewsApi newsApi;
+    private final TinNewsDatabase database;
+
+    private static class FavoriteAsyncTask extends AsyncTask<Article, Void, Boolean> {
+
+        private final TinNewsDatabase database;
+        private final MutableLiveData<Boolean> liveData;
+
+        private FavoriteAsyncTask(TinNewsDatabase database, MutableLiveData<Boolean> liveData) {
+            this.database = database;
+            this.liveData = liveData;
+        }
+
+        @Override
+        protected Boolean doInBackground(Article... articles) {
+            Article article = articles[0];
+            try {
+                database.articleDao().saveArticle(article);
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            liveData.setValue(success);
+        }
+    }
+    public LiveData<Boolean> favoriteArticle(Article article) {
+        MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
+        new FavoriteAsyncTask(database, resultLiveData).execute(article);
+        return resultLiveData;
+    }
+
+
 
     public NewsRepository() {
+
         newsApi = RetrofitClient.newInstance().create(NewsApi.class);
+        database = TinNewsApplication.getDatabase();
+
     }
     public LiveData<NewsResponse> getTopHeadlines(String country) {
         MutableLiveData<NewsResponse> topHeadlinesLiveData = new MutableLiveData<>();
