@@ -12,6 +12,8 @@ import com.project.tinnews.model.NewsResponse;
 import com.project.tinnews.network.NewsApi;
 import com.project.tinnews.network.RetrofitClient;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -21,10 +23,21 @@ public class NewsRepository {
     private final NewsApi newsApi;
     private final TinNewsDatabase database;
 
+    public LiveData<List<Article>> getAllSavedArticles() {
+        return database.articleDao().getAllArticles();
+    }
+
+    public void deleteSavedArticle(Article article) {
+        AsyncTask.execute(() -> database.articleDao().deleteArticle(article));
+    }
+
+
     private static class FavoriteAsyncTask extends AsyncTask<Article, Void, Boolean> {
 
         private final TinNewsDatabase database;
         private final MutableLiveData<Boolean> liveData;
+
+
 
         private FavoriteAsyncTask(TinNewsDatabase database, MutableLiveData<Boolean> liveData) {
             this.database = database;

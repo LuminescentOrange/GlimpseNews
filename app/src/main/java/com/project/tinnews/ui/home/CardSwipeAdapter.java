@@ -30,7 +30,7 @@ public class CardSwipeAdapter extends RecyclerView.Adapter<CardSwipeAdapter.Card
     }
 
 
-    // 2. CardSwipeViewHolder:
+    // 2. Adapter overrides:
     // TODO
     @NonNull
     @Override
@@ -53,7 +53,7 @@ public class CardSwipeAdapter extends RecyclerView.Adapter<CardSwipeAdapter.Card
     }
 
 
-    // 3. Adapter overrides:
+    // 3. CardSwipeViewHolder:
     // TODO
     public static class CardSwipeViewHolder extends RecyclerView.ViewHolder {
 
